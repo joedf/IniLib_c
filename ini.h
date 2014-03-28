@@ -22,13 +22,19 @@ extern int INI_ERROR;
 #define INI_ERROR_PARSE          0x09 // 09
 #define INI_ERROR_PARSEINVALID   0x0A // 10
 
+#ifndef INI_AUTOTRIM
+    #define INI_AUTOTRIM 1
+#endif
+
 #ifdef INI_CASESENSITIVE
 	#define INI_CASESENSITIVE 1
 #else
 	#define INI_CASESENSITIVE 0
 #endif
 
-#define INI_MAXLINE 200
+#ifndef INI_MAXLINE
+    #define INI_MAXLINE 200
+#endif
 
 /*
 

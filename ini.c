@@ -16,9 +16,10 @@ char *ini_read(char *file, char *section, char *key, char *dvalue) {
 		return dvalue;
 	} else {
 		int slen = 2+strlen(section);
-		char *s = malloc(slen+1); sprintf(s,"[%s]",strlower(section)); s[slen]='\0';
-		char *k = strlower(key); //int klen = strlen(k);
-		char line[INI_MAXLINE], keyname[INI_MAXLINE];
+		//char *s = malloc(slen+1); sprintf(s,"[%s]",strlower(section)); s[slen]='\0';
+		//char *k = strlower(key); //int klen = strlen(k);
+		char line[INI_MAXLINE];
+		//char keyname[INI_MAXLINE];
 		int in_section = 0, found_section = 0, k_end, linenum=0, no_section=0;
 		if (strlen(section)==0 || section == NULL)
 			no_section=1;
@@ -43,13 +44,21 @@ char *ini_read(char *file, char *section, char *key, char *dvalue) {
 			{
 				strcpy(line,strlower(line));
 
-				if (((strstr(line,s)-line)+1)>=0) {
-					in_section=1;
-					found_section=1;
+				/*
+				printf("DEBUG: ini_section(line) = \"%s\" : (%d) original: \"%s\"\n",
+							   ini_section(line),
+							   (strcmp(strlower(ini_section(line)),strlower(section))==0),
+							   strlower(section));
+	   						   */
+
+				//if (((strstr(line,s)-line)+1)>=0) {
+	   			if (strcmp(strlower(ini_section(line)),strlower(section))==0) { //found section
+				   in_section=1;
+				   found_section=1;
 					if (strlen(key)==0 || key==NULL)
 					{
-						free(s);
-						free(k);
+						//free(s);
+						//free(k);
 						fclose(pFile);
 						return section;
 					}
@@ -62,12 +71,13 @@ char *ini_read(char *file, char *section, char *key, char *dvalue) {
 				k_end=((strchr(line,'=')-line)+1);
 				if (k_end>0)
 				{
-					strcpy(keyname,strlower(line)); keyname[k_end-1]='\0';
+					//strcpy(keyname,strlower(line)); keyname[k_end-1]='\0';
 
-					if (strcmp(keyname,k)==0)
+					//if (strcmp(keyname,k)==0)
+					if ((ini_key(line)!=NULL) && (strcmp(strlower(ini_key(line)),strlower(key))==0)) //found key
 					{
-						free(s);
-						free(k);
+						//free(s);
+						//free(k);
 						fclose(pFile);
 						return substr(line,k_end,(strlen(line)-k_end));
 					}
@@ -80,8 +90,8 @@ char *ini_read(char *file, char *section, char *key, char *dvalue) {
 			else if (found_section && !in_section)
 				break; //return section;
 		}
-		free(s);
-		free(k);
+		//free(s);
+		//free(k);
 		fclose(pFile);
 	}
 	
@@ -249,7 +259,11 @@ char *ini_section(char *line) {
 		return NULL;
 	int len = strlen(line);
 	if (line[0]=='[' && line[len-1]==']') //if section
-		return substr(line, 1, len-2);
+	    #if INI_AUTOTRIM
+			return ini_strip(substr(line, 1, len-2));
+		#else
+		    return substr(line, 1, len-2);
+		#endif
 	else
 		return NULL;
 }
@@ -258,14 +272,17 @@ char *ini_key(char *line) {
 	if (line==NULL)
 		return NULL;
 	int k_end=(strchr(line,'=')-line)+1;
-	char *keyname = malloc(INI_MAXLINE);
 	if (k_end>0)
 	{
+		char *keyname = malloc(INI_MAXLINE);
 		strcpy(keyname,strlower(line)); keyname[k_end-1]='\0';
-		return keyname;
+		#if INI_AUTOTRIM
+			return ini_strip(keyname);
+		#else
+		    return keyname;
+		#endif
 	}
-	
-	free(keyname);
+
 	if (k_end==0)
 	{
 		INI_ERROR = ini_error(INI_ERROR_PARSEINVALID,INI_ERROR_VERBOSE);
