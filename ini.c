@@ -15,18 +15,19 @@ char *ini_read(char *file, char *section, char *key, char *dvalue) {
 		INI_ERROR = ini_error(INI_ERROR_FILEREAD,INI_ERROR_VERBOSE);
 		return dvalue;
 	} else {
-		int slen = 2+strlen(section);
+		//int slen = 2+strlen(section);
 		//char *s = malloc(slen+1); sprintf(s,"[%s]",strlower(section)); s[slen]='\0';
 		//char *k = strlower(key); //int klen = strlen(k);
 		char line[INI_MAXLINE];
 		//char keyname[INI_MAXLINE];
-		int in_section = 0, found_section = 0, k_end, linenum=0, no_section=0;
+		int in_section = 0, found_section = 0, k_end, no_section=0;
+		//int linenum=0;
 		if (strlen(section)==0 || section == NULL)
 			no_section=1;
 		
 		while(fgets(line,sizeof(line),pFile) != NULL)
 		{
-			linenum+=1;
+			//linenum+=1;
 			int nr, len = strlen(line);
 			//if(line[len-1] == '\n') line[len-1] = '\0'; // strip trailing '\n' if it exists
 			for (nr=len;nr>1;nr--) {
@@ -125,10 +126,11 @@ int ini_write(char *file, char *section, char *key, char *value) {
 		{
 			char line[INI_MAXLINE], o_line[INI_MAXLINE];
 			char* current_section = malloc(INI_MAXLINE);
-			int linenum=0, len, updated=0, nr;
+			//int linenum=0
+			int len, updated=0, nr;
 			while(fgets(line,sizeof(line),pFile) != NULL)
 			{
-				linenum+=1;
+				//linenum+=1;
 				
 				len = strlen(line);
 				/*
@@ -312,14 +314,21 @@ int ini_error(int error, int v) {
 
 char *ini_strip(char *str) {
 	int i, j, len=strlen(str);
-	char *out=malloc(len+1); //out[0]='\0';
 	for (i=0;isspace((unsigned char)str[i]);i++)
 		{ /*nothing...*/ }
-	out=strtrim_l(str,i);
+	int m = strlen(str)-i;
+	char *out = malloc(m+1);
+	memcpy(out+0,str+i,m+1);
 	for (j=strlen(out);isspace((unsigned char)out[j-1]);j--)
 		{ /*nothing...*/ }
 	out[j]='\0';
-	return out;
+	char *new_p = realloc(out,j+1);
+	if (new_p == NULL) //...handle error
+	{
+		ini_error(INI_ERROR_MEMORYALLOC,INI_ERROR_VERBOSE);
+		return out;
+	}
+	return new_p;
 }
 
 //      [INI Utility Functions]
@@ -351,15 +360,6 @@ char *substr(char *str, int start, int length) {
 	{
 		return NULL;
 	}
-}
-
-char *strtrim_l(const char *string, int trim) {
-	int len=strlen(string);
-	char *to=malloc(len+1);
-	char *str=strncpy(to,string+trim,len);
-	//free(to);
-	str[len]='\0';
-	return str;
 }
 
 

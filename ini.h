@@ -9,7 +9,6 @@
 
 extern int INI_ERROR;
 
-#define INI_ERROR_VERBOSE        1  // true
 #define INI_ERROR_NONE           0x00 // 00
 #define INI_ERROR_UNKNOWN        0x01 // 01
 #define INI_ERROR_FILE           0x02 // 02
@@ -21,6 +20,10 @@ extern int INI_ERROR;
 #define INI_ERROR_MEMORYALLOC    0x08 // 08
 #define INI_ERROR_PARSE          0x09 // 09
 #define INI_ERROR_PARSEINVALID   0x0A // 10
+
+#ifndef INI_ERROR_VERBOSE
+    #define INI_ERROR_VERBOSE 1
+#endif
 
 #ifndef INI_AUTOTRIM
     #define INI_AUTOTRIM 1
