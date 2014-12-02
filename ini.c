@@ -334,7 +334,7 @@ char *ini_strip(char *str) {
 //      [INI Utility Functions]
 //------------------------------------
 char *strlower(char *str) {
-	#if INI_CASESENSITIVE
+	#if !(INI_CASESENSITIVE)
 		int i, len=strlen(str);
 		char *out=malloc(len+1);
 		for (i=0;i<len;i++)
