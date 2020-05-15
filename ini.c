@@ -83,7 +83,7 @@ char *ini_read(char *file, char *section, char *key, char *dvalue) {
 						return substr(line,k_end,(strlen(line)-k_end));
 					}
 				}
-				else if (k_end=0)
+				else if (k_end == 0)
 				{
 					INI_ERROR = ini_error(INI_ERROR_PARSEINVALID,INI_ERROR_VERBOSE);
 				}
@@ -115,7 +115,7 @@ int ini_write(char *file, char *section, char *key, char *value) {
 	  and replace it with the output file
 */
 	char *tmp = malloc(strlen(file)+8);
-	sprintf(tmp,"%s.tmp\0",file);
+	sprintf(tmp,"%s.tmp",file);
 
 	FILE* pFile = fopen(file,"rb");
 
